@@ -1,5 +1,7 @@
 package com.spotoyou;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -28,9 +30,9 @@ public class SpoToYouApplication {
 		SpringApplication.run(SpoToYouApplication.class, args);
 	}
 	
-	@GetMapping("/replicatePlaylist")
+	@GetMapping("/getSongsfor")
 	public String replicatePlaylist(@RequestParam(value = "spotId", defaultValue = "7kRrpb1iLm7SqHvpIAjRrh") String spotId) throws Exception {
-		String[] searchTerms = new String[0];
+		String songs = "";
 		String rawdata = "";
 		
 		//Spotify
@@ -45,28 +47,56 @@ public class SpoToYouApplication {
 		}
 		
 		//Mapping
-		searchTerms = mapping(rawdata);
+		songs = mapping(rawdata);
 		log.info("mapping successfull");
+		log.info(songs.toString());
 
 		//Youtube
-		MyYoutubeApi.createPlaylist(searchTerms);
-		log.info(successmessage);
-		return successmessage;
+//		MyYoutubeApi.createPlaylist(searchTerms);
+//		log.info(successmessage);
+		return songs;
 	}
 	
-	public String[] mapping(String json) throws IOException {
+	public String mapping(String json) throws IOException {
+		int pagenum = 0;
+		String img = "";
 		String song = "";
 		String artist = "";
-		String[] list = new String[MySpotifyApi.getPlaylistLength()];
+		String jsonlist = "[\n";
+		int num = MySpotifyApi.getPlaylistLength();
 		ObjectMapper objectMapper = new ObjectMapper();
 		JsonNode jsonNode = objectMapper.readTree(json);
-		for (int i = 0; i < jsonNode.size(); i++) {
-			for (int j = 0; j < jsonNode.get(i).size(); j++) {
+		String[] namelist = new String[num];
+		String[] imglist = new String[num];
+		pagenum = jsonNode.size();
+		for (int i = 0; i < pagenum; i++) {
+			for (int j = 0; j < jsonNode.get(i).get("items").size(); j++) {
+				num = i * 100 + j;
 				song = jsonNode.get(i).get("items").get(j).get("track").get("name").asText();
 				artist = jsonNode.get(i).get("items").get(j).get("track").get("artists").get(0).get("name").asText();
-				list[j * i] = song + " by " + artist;
+				img = jsonNode.get(i).get("items").get(j).get("track").get("album").get("images").get(2).get("url").asText();
+				namelist[num] = artist + " - " + song; 
+				imglist[num] = img;
+				if(i == (pagenum-1) & j == (jsonNode.get(pagenum-1).get("items").size()-1)) {
+					jsonlist = jsonlist + "{\"Name\":\"" + namelist[num] + "\",\n\"Img\":\"" + imglist[num] + "\"}\n";
+				} else {
+					jsonlist = jsonlist + "{\"Name\":\"" + namelist[num] + "\",\n\"Img\":\"" + imglist[num] + "\"},\n";
+				}
 			};
 		};
-		return list;
+		jsonlist = jsonlist + "\n]";
+		
+		File filename = new File("C:\\Tmp\\WorkingDirectory\\" + MySpotifyApi.getPlaylistName() + "List.json");
+		if (filename.createNewFile()) {
+			log.info("File is created!");
+		} else {
+			log.info("File already exists.");
+		}
+
+		FileWriter writer = new FileWriter(filename);
+		writer.write(jsonlist);
+		writer.close();
+		
+		return jsonlist;
 	}
 }
