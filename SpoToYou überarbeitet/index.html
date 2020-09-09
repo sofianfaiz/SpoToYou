@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpoToYou</title>
+    <link rel="stylesheet" href="style.css" class="css">
+</head>
+<body>
+    <div id=top>
+        <!-- The SpoToYou Logo-->
+        <div id="logo">
+            <button onclick="changeActiveSection('logIn')"><img src="SpoToYouLogo.JPG" alt="the SpoToYouLogo"></button>
+        </div>
+        <!--Headline & introductional discription of the application-->
+        <div id="introduction">
+            <h1 id="headline">
+                Spotify to Youtube - the first Playlist Convertor
+            </h1>
+            <p id="discription">
+                <b>SpoToYou</b> brings your favorite Spotify Playlists directly to you, already listenable for free and allways available on Youtube.
+                 Just enter your username right <a href="#enterUsername">here</a>  and just choose one of your public Playlists and easily convert it.
+            </p>
+        </div>
+        <!--image of vinyles-->
+        <div id="image">
+            <img src="image.jpg" alt="ein schöes Bild von Vinyl-Platten">
+        </div>
+    </div>
+    <!--the user log in by spotify username-->
+    <div id="logIn" class="section activeSection">
+        <!--instruction-->
+        <h2 id="instruction">
+            Type in your Spotify username
+        </h2>
+        <div id="userInput">
+            <label for="enterUsername">username</label>
+            <input type="text" id="enterUsername">
+            <button onclick="checkIfEmpty('button')">confirm</button>
+        </div>
+    </div>
+    <!--selection of your Playlist-->
+    <div id="playlistSelection" class="section listSection">
+        <h2 >select the playlist you´d like to convert</h2>
+        <ul id="listOfPlaylist">
+        </ul>
+    </div>
+    <!--selection of your Tracks-->
+    <div id="trackSelection" class="section listSection">
+        <h2 >select the tracks you´d like to convert</h2>
+        <div id=centerButton>
+            <button id="convertButton">convert your playlist</button>
+            <button class="controlButton" onclick="checkAll()">check all</button>
+            <button class="controlButton" onclick="uncheckAll()">uncheck all</button>
+        </div>
+        <ul id="listOfTracks">
+        </ul>
+    </div>
+    <!--endscreen with the link-->
+    <div id="endScreen" class="section">
+        <p >thanks for using SpoToYou click on the 
+            <a href="https://www.youtube.com/">Link</a>
+            to get to your converted playlist or just 
+            <a onclick="returnLink()">copy</a>
+            it. By clicking 
+            <a onclick="changeActiveSection('logIn')">here</a> 
+            you´ll return to the log in page and will be able to convert another Playlist.
+        </p>
+    </div>
+
+    <div id="footer">
+        Copyright 2020 | SpoToYou Web Application
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
