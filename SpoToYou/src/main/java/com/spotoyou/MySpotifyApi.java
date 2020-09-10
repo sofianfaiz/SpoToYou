@@ -23,6 +23,7 @@ import com.wrapper.spotify.model_objects.specification.Paging;
 import com.wrapper.spotify.model_objects.specification.Playlist;
 import com.wrapper.spotify.model_objects.specification.PlaylistTrack;
 import com.wrapper.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
+import com.wrapper.spotify.requests.data.playlists.GetListOfUsersPlaylistsRequest;
 import com.wrapper.spotify.requests.data.playlists.GetPlaylistRequest;
 import com.wrapper.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
 
@@ -32,7 +33,7 @@ import com.wrapper.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
  */
 public class MySpotifyApi {
 
-	private static String Name = "";
+	private static String Name = "Stanni";
 	private static int Length = 0;
 	private static String token = "";
 	private static final Logger log = LoggerFactory.getLogger(MySpotifyApi.class);
@@ -52,6 +53,38 @@ public class MySpotifyApi {
 			log.info("Expires in: " + clientCredentials.getExpiresIn());
 		} catch (IOException | SpotifyWebApiException | ParseException e) {
 			log.info("Error: " + e.getMessage());
+		}
+	}
+
+	public static String getUser(String Id) {
+		final SpotifyApi spotifyApi = new SpotifyApi.Builder().setAccessToken(token).build();
+		final GetListOfUsersPlaylistsRequest getListOfUsersPlaylistsRequest = spotifyApi.getListOfUsersPlaylists(Id)
+//				          .limit(10)
+//				          .offset(0)
+				.build();
+
+		try {
+			String Json = "[\n";
+			getListOfUsersPlaylistsRequest.execute();
+			Json = getListOfUsersPlaylistsRequest.getJson();
+			
+			File filename = new File("C:\\Tmp\\WorkingDirectory\\" + Id + ".json");
+			if (filename.createNewFile()) {
+				log.info("File is created!");
+			} else {
+				log.info("File already exists.");
+			}
+
+			FileWriter writer = new FileWriter(filename);
+			writer.write(Json);
+			writer.close();
+
+			return Json;
+
+		} catch (IOException | SpotifyWebApiException | ParseException e) {
+			log.info("Error: " + e.getMessage());
+			log.info("data acquiry failed");
+			return "Error: " + e.getMessage();
 		}
 	}
 
@@ -91,7 +124,7 @@ public class MySpotifyApi {
 					}
 					in.close();
 					con.disconnect();
-					if (i == (Length/100)) {
+					if (i == (Length / 100)) {
 						Json = Json + content;
 					} else {
 						Json = Json + content + ",";
@@ -116,14 +149,15 @@ public class MySpotifyApi {
 			return Json;
 		} catch (IOException | SpotifyWebApiException | ParseException e) {
 			log.info("Error: " + e.getMessage());
+			log.info("data acquiry failed");
 			return "Error: " + e.getMessage();
 		}
 	}
-
+	
 	public static String getPlaylistName() {
 		return Name;
 	}
-	
+
 	public static int getPlaylistLength() {
 		return Length;
 	}

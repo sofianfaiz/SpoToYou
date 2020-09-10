@@ -76,23 +76,33 @@ public class MyYoutubeApi {
 			youtube = new YouTube.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
 					.setApplicationName("youtube-cmdline-playlistupdates-sample").build();
 			log.info("youtube builder successfull");
-			
-			TimeUnit.SECONDS.sleep(1);
 
-			String playlistId = insertPlaylist();
-			log.info("playlist inserted");
+//			String playlistId = insertPlaylist();
+			String playlistId = "PLn16NZ5qTMRhMaAL2-ZaZt9tpq8jgpPHi";
+			log.info("playlist inserted " + playlistId);
 			
-			TimeUnit.SECONDS.sleep(1);
 			
+			for (int i = 0; i < searchTerms.length; i++) {
+				log.info(searchTerms[i]);
+				
+				VIDEO_ID = getVideoId(searchTerms[i]);
+			}
+			
+			insertPlaylistItem(playlistId, VIDEO_ID);
+			
+			log.info("last item inserted");
+			
+			/*
 			for (int i = 0; i < MySpotifyApi.getPlaylistLength(); i++) {
 				VIDEO_ID = getVideoId(searchTerms[i]);
 				log.info("item " + i + " id retrieved");
 				
-				TimeUnit.SECONDS.sleep(1);
+				TimeUnit.SECONDS.sleep(5);
 				
 				insertPlaylistItem(playlistId, VIDEO_ID);
-				log.info("item inserted");
+				log.info("item " + i + " inserted");
 			}
+			*/
 
 		} catch (GoogleJsonResponseException e) {
 			System.err.println(
@@ -137,9 +147,9 @@ public class MyYoutubeApi {
 
 		PlaylistSnippet playlistSnippet = new PlaylistSnippet();
 		playlistSnippet.setTitle(MySpotifyApi.getPlaylistName());
-		playlistSnippet.setDescription("A private playlist replicated from Spotify");
+		playlistSnippet.setDescription("A public playlist replicated from Spotify");
 		PlaylistStatus playlistStatus = new PlaylistStatus();
-		playlistStatus.setPrivacyStatus("private");
+		playlistStatus.setPrivacyStatus("public");
 
 		Playlist youTubePlaylist = new Playlist();
 		youTubePlaylist.setSnippet(playlistSnippet);
@@ -156,32 +166,68 @@ public class MyYoutubeApi {
 		return playlistInserted.getId();
 
 	}
+	
+	public static void insertPlaylistItem(String playlistId, String videoId) throws IOException {
 
-	private static String insertPlaylistItem(String playlistId, String videoId) throws IOException {
+		log.info(playlistId + ": " + videoId);
+        ResourceId resourceId = new ResourceId();
+        resourceId.setKind("youtube#video");
+        resourceId.setVideoId(videoId);
+        
+        PlaylistItemSnippet playlistItemSnippet = new PlaylistItemSnippet();
+//        playlistItemSnippet.setTitle("First video in the playlist");
+        playlistItemSnippet.setPlaylistId(playlistId);
+        playlistItemSnippet.setResourceId(resourceId);
+        
+        PlaylistItem playlistItem = new PlaylistItem();
+        playlistItem.setSnippet(playlistItemSnippet);
+        
+        YouTube.PlaylistItems.Insert playlistItemsInsertCommand =
+                youtube.playlistItems().insert("snippet,contentDetails", playlistItem);
+        PlaylistItem returnedPlaylistItem = playlistItemsInsertCommand.execute();
+        
+        System.out.println("New PlaylistItem name: " + returnedPlaylistItem.getSnippet().getTitle());
+        System.out.println(" - Video id: " + returnedPlaylistItem.getSnippet().getResourceId().getVideoId());
+        System.out.println(" - Posted: " + returnedPlaylistItem.getSnippet().getPublishedAt());
+        System.out.println(" - Channel: " + returnedPlaylistItem.getSnippet().getChannelId());
+        
+		/*
+        // Define a resourceId that identifies the video being added to the
+        // playlist.
+        ResourceId resourceId = new ResourceId();
+        resourceId.setKind("youtube#video");
+        resourceId.setVideoId(videoId);
 
-		ResourceId resourceId = new ResourceId();
-		resourceId.setKind("youtube#video");
-		resourceId.setVideoId(videoId);
+        // Set fields included in the playlistItem resource's "snippet" part.
+        PlaylistItemSnippet playlistItemSnippet = new PlaylistItemSnippet();
+        playlistItemSnippet.setTitle("First video in the test playlist");
+        playlistItemSnippet.setPlaylistId(playlistId);
+        playlistItemSnippet.setResourceId(resourceId);
 
-		PlaylistItemSnippet playlistItemSnippet = new PlaylistItemSnippet();
-		playlistItemSnippet.setTitle("First video in the test playlist");
-		playlistItemSnippet.setPlaylistId(playlistId);
-		playlistItemSnippet.setResourceId(resourceId);
+        // Create the playlistItem resource and set its snippet to the
+        // object created above.
+        PlaylistItem playlistItem = new PlaylistItem();
+        playlistItem.setSnippet(playlistItemSnippet);
 
-		PlaylistItem playlistItem = new PlaylistItem();
-		playlistItem.setSnippet(playlistItemSnippet);
+        // Call the API to add the playlist item to the specified playlist.
+        // In the API call, the first argument identifies the resource parts
+        // that the API response should contain, and the second argument is
+        // the playlist item being inserted.
+        YouTube.PlaylistItems.Insert playlistItemsInsertCommand =
+                youtube.playlistItems().insert("snippet,contentDetails", playlistItem);
+        PlaylistItem returnedPlaylistItem = playlistItemsInsertCommand.execute();
 
-		YouTube.PlaylistItems.Insert playlistItemsInsertCommand = youtube.playlistItems()
-				.insert("snippet,contentDetails", playlistItem);
-		PlaylistItem returnedPlaylistItem = playlistItemsInsertCommand.execute();
+        // Print data from the API response and return the new playlist
+        // item's unique playlistItem ID.
 
-		System.out.println("New PlaylistItem name: " + returnedPlaylistItem.getSnippet().getTitle());
-		System.out.println(" - Video id: " + returnedPlaylistItem.getSnippet().getResourceId().getVideoId());
-		System.out.println(" - Posted: " + returnedPlaylistItem.getSnippet().getPublishedAt());
-		System.out.println(" - Channel: " + returnedPlaylistItem.getSnippet().getChannelId());
-		return returnedPlaylistItem.getId();
-
-	}
+        System.out.println("New PlaylistItem name: " + returnedPlaylistItem.getSnippet().getTitle());
+        System.out.println(" - Video id: " + returnedPlaylistItem.getSnippet().getResourceId().getVideoId());
+        System.out.println(" - Posted: " + returnedPlaylistItem.getSnippet().getPublishedAt());
+        System.out.println(" - Channel: " + returnedPlaylistItem.getSnippet().getChannelId());
+        
+        return returnedPlaylistItem.getId();
+        */
+    }
 
 	public static String getVideoId(String searchTerm) {
 		String Id = "KXcChl2Gj8I";
