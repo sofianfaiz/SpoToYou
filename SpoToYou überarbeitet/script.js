@@ -1,7 +1,6 @@
 var listOfTracks =document.getElementById("listOfTracks");
 var tracks = listOfTracks.children;
 var textField = document.getElementById("enterUsername");
-var convertButton = document.getElementById("convertButton");
 var trackJson = [
     {"Name":"Kid Simius - The Flute Song - Paul Kalkbrenner Remix",
     "Img":"https://i.scdn.co/image/ab67616d00004851db0346d1f6790958e6d72349"},
@@ -370,8 +369,6 @@ var trackJson = [
     
     ]
 
-console.log(Object.keys(trackJson).length);
-
 
 //eventtrigger when enter pressed
 textField.addEventListener("keydown", function(event){
@@ -379,23 +376,19 @@ textField.addEventListener("keydown", function(event){
         checkIfEmpty("enter");
     }
 })
-//eventtrigger when tracks are selected
-convertButton.addEventListener("click", function(event){
-    convertPlaylist()
-})
-
+//checks all tracks
 function checkAll(){
     for (let index = 0; index < tracks.length; index++){
         tracks[index].children[0].children[2].checked = true;
     }
 }
-
+//unchecks all tracks
 function uncheckAll(){
     for (let index = 0; index < tracks.length; index++){
         tracks[index].children[0].children[2].checked = false;
     }
 }
-//deletes all li from all ul
+//deletes all li from an ul
 function deleteLi(ulId){
     var ul = document.getElementById(ulId)
     while( ul.firstChild ){
@@ -439,7 +432,7 @@ function checkIfEmpty(eventType){
         instruction.parentNode.replaceChild(newInstruction, instruction);
     }
     else{
-        getPlaylists(username);
+        getUsersPlaylists(username);
     }
 }
 //creates a new playlist as a li
@@ -450,7 +443,7 @@ function createPlaylistLi(playlistName,playlistImg,playlistId){
     var newButton = document.createElement("button");
         newButton.classList.add("playlistButton");
         newButton.addEventListener("click", function(event){
-            getPlaylistsTracks(playlistId);
+            getPlaylistTracks(playlistId);
         })
     var newImg = document.createElement("img");
         newImg.src = playlistImg;
@@ -465,9 +458,9 @@ function createPlaylistLi(playlistName,playlistImg,playlistId){
     console.log(`playlist: ${playlistName} wurde erstellt`);
 }
 //return the username and getting arr of that user´s playlists
-function getPlaylists(username){
+function getUsersPlaylists(username){
     console.log(`der username ${username} wurde eingegeben`);
-    //get Request
+    var url = "http://localhost:8080/getPlaylistsfrom?user="+username;
     //arr of Playlist
     createPlaylistLi("lofi","https://i.scdn.co/image/ab67616d0000b273db0346d1f6790958e6d72349","idnmr2");
     createPlaylistLi("Hip Hop aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","https://i.scdn.co/image/ab67616d0000b273db0346d1f6790958e6d72349","idnmr3");
@@ -498,10 +491,11 @@ function createTrackLi(trackName,trackImg){
     console.log(`Track: ${trackName} wurde erstellt`);
 }
 //return the playlist id and getting arr of that playlist´s tracks
-function getPlaylistsTracks(id){
+function getPlaylistTracks(id){
     console.log(`Playlist mit Id nr. ${id} wurde ausgewählt.`);
+    var url = "http://localhost:8080/getSongsfor?spotId="+id;
     //get Request
-    for (let index = 0; index < Object.keys(trackJson).length; index++) {
+    for (let index = 0; index < trackJson.length; index++) {
         var trackName = trackJson[index].Name;
         var trackImg = trackJson[index].Img;
         createTrackLi(trackName, trackImg);
