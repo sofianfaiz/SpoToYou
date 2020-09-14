@@ -9,15 +9,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -36,11 +33,11 @@ public class SpoToYouApplication {
 	}
 	
 	@GetMapping("/getPlaylistsfrom")
-	public String getPlaylistsfrom(@RequestParam(value = "user", defaultValue = "n8field") String user) 
+	public String getPlaylistsfrom(@RequestParam(value = "user", defaultValue = "spotify") String user) 
 			throws Exception {
 		String rawdata = "";
 		String playlists = "";
-
+		
 		// Spotify
 		MySpotifyApi.setAnonymousToken(clientId, clientSecret);
 		log.info("token set successfull");
@@ -100,6 +97,7 @@ public class SpoToYouApplication {
 	}
 
 	public String mappingOne(String json) throws IOException {
+		int imgs = 0;
 		String id = "";
 		String img = "";
 		String name = "";
@@ -110,23 +108,24 @@ public class SpoToYouApplication {
 		String[] idlist = new String[num];
 		String[] namelist = new String[num];
 		String[] imglist = new String[num];
-		log.info("Num: " + num);
+		log.info("Playlists: " + num);
 		for (int i = 0; i < num; i++) {
 			id = jsonNode.get("items").get(i).get("id").asText();
 			name = jsonNode.get("items").get(i).get("name").asText();
-			img = jsonNode.get("items").get(i).get("images").get(2).get("url").asText();
+			imgs = jsonNode.get("items").get(i).get("images").size()-1;
+			img = jsonNode.get("items").get(i).get("images").get(imgs).get("url").asText();
 			namelist[i] = name;
 			imglist[i] = img;
 			idlist[i] = id;
-			log.info(namelist[i] + imglist[i] + idlist[i]);
-			if (i == num - 1) {
-				jsonlist = jsonlist + "{\"Name\":\"" + namelist[i] + "\",\n\"Img\":\"" + imglist[i] + "\",\n\"Id\":\"" + idlist[i] + "\"}";
+			if (i == num-1) {
+				jsonlist = jsonlist + "{\"Name\":\"" + namelist[i] + "\",\n\"Img\":\"" + imglist[i] + "\",\n\"Id\":\"" + idlist[i] + "\"}\n";
 			} else {
 				jsonlist = jsonlist + "{\"Name\":\"" + namelist[i] + "\",\n\"Img\":\"" + imglist[i] + "\",\n\"Id\":\"" + idlist[i] + "\"},\n";
 			}
-		}
-		;
-		jsonlist = jsonlist + "\n]";
+			log.info("Round " + i);
+		};
+		jsonlist = jsonlist + "]";
+		
 		JsonNode finaljsonNode = objectMapper.readTree(jsonlist);
 		jsonlist = finaljsonNode.toPrettyString();
 
