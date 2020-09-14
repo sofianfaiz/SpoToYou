@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,9 +34,9 @@ public class SpoToYouApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SpoToYouApplication.class, args);
 	}
-
+	
 	@GetMapping("/getPlaylistsfrom")
-	public String getPlaylistsfrom(@RequestParam(value = "user", defaultValue = "n8field") String user)
+	public String getPlaylistsfrom(@RequestParam(value = "user", defaultValue = "n8field") String user) 
 			throws Exception {
 		String rawdata = "";
 		String playlists = "";
