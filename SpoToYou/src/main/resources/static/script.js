@@ -1,12 +1,18 @@
 var listOfTracks =document.getElementById("listOfTracks");
 var tracks = listOfTracks.children;
-var textField = document.getElementById("enterUsername");
-
+var usernameTextField = document.getElementById("enterUsername");
+var playlistIdTextField = document.getElementById("enterPlaylistId");
 
 //eventtrigger when enter pressed
-textField.addEventListener("keydown", function(event){
+usernameTextField.addEventListener("keydown", function(event){
     if (event.keyCode === 13) {
         checkIfEmpty("enter");
+    }
+})
+//eventtrigger when enter pressed
+playlistIdTextField.addEventListener("keydown", function(event){
+    if (event.keyCode === 13) {
+        getPlaylistById();
     }
 })
 //checks all tracks
@@ -49,9 +55,9 @@ function changeActiveSection(newActiveSection){
 }
 //checks if empty, if yes rewrites Instruction, if not triggers all needed functions
 function checkIfEmpty(eventType){
-    var username = textField.value;
+    var username = usernameTextField.value;
     username = username.trim();
-    textField.value = "";
+    usernameTextField.value = "";
     if (username == ""){
         if(eventType == "button"){
             var alertMessage = document.createTextNode("Please Type in your Spotify username befor using the button")
@@ -59,13 +65,29 @@ function checkIfEmpty(eventType){
         else if(eventType == "enter"){
             var alertMessage = document.createTextNode("Please Type in your Spotify username befor pressing enter")
         }
-        var newInstruction = document.createElement("h2");
-        newInstruction.appendChild(alertMessage);
-        var instruction = document.querySelector("h2");
+        var newInstruction = document.createElement("h2").appendChild(alertMessage);
+        var instruction = document.getElementsByClassName("logInh2");
         instruction.parentNode.replaceChild(newInstruction, instruction);
+        newInstruction.id = "logInh2";
     }
     else{
         getUsersPlaylists(username);
+    }
+}
+
+function getPlaylistById(){
+    var playlistId = playlistIdTextField.value;
+    console.log("playlist Id: " + playlistId + " entered")
+    playlistId = playlistId.trim();
+    playlistIdTextField.value = "";
+    if (playlistId == ""){
+        var newInstruction = document.createElement("h2").appendChild("Please enter an id befor confirming");
+        var instruction = document.getElementsByClassName("playlistByIdh2");
+        instruction.parentNode.replaceChild(newInstruction, instruction);
+        newInstruction.id = "playlistByIdh2";
+    }
+    else{
+        getPlaylistTracks(playlistId);
     }
 }
 //creates a new playlist as a li
@@ -148,8 +170,12 @@ function createTrackLi(trackName,trackImg){
 }
 //return the playlist id and getting arr of that playlist´s tracks
 function getPlaylistTracks(id){
-    var url = "http://localhost:8080/getPlaylistsfrom?user=" + id;
-    fetch (url)
+    var url = "http://localhost:8080/getSongsfor?spotId=" + id;
+    var requestOptions = {
+        method: 'GET',
+        redirect: 'follow'
+      }      
+    fetch (url, requestOptions)
     .then (response => {
         if (response.ok){
             console.log("Track creation for playlist with id :" + id+ "started");
@@ -168,7 +194,7 @@ function getPlaylistTracks(id){
         }
     })
     .then( () => {
-        changeActiveSection("playlistSelection");
+        changeActiveSection("trackSelection");
     })
     .catch(error => {
         console.log(error);

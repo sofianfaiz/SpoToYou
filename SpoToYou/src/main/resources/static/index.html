@@ -19,7 +19,8 @@
             </h1>
             <p id="discription">
                 <b>SpoToYou</b> brings your favorite Spotify Playlists directly to you, already listenable for free and allways available on Youtube.
-                 Just enter your username right <a href="#enterUsername">here</a>  and just choose one of your public Playlists and easily convert it.
+                 Just enter your username right <a href="#enterUsername" onclick="changeActiveSection('logIn')">here</a>  and just choose one of your public Playlists and easily convert it.
+                 For searching after playlist not owned by you simply inter its  spotify id <a href="#enterPlaylistId" onclick="changeActiveSection('playlistById')">here</a>.
             </p>
         </div>
         <!--image of vinyles-->
@@ -28,15 +29,27 @@
         </div>
     </div>
     <!--the user log in by spotify username-->
-    <div id="logIn" class="section activeSection">
+    <div id="logIn" class="section activeSection inputSection">
         <!--instruction-->
-        <h2 id="instruction">
+        <h2 class="logInh2">
             Type in your Spotify username
         </h2>
-        <div id="userInput">
+        <div class="userInput">
             <label for="enterUsername">username</label>
             <input type="text" id="enterUsername">
             <button onclick="checkIfEmpty('button')">confirm</button>
+        </div>
+    </div>
+
+    <div id="playlistById" class="section inputSection">
+        <!--instruction-->
+        <h2 class="playlistByIdh2">
+            Enter your playlist´s spotify id. 
+        </h2>
+        <div class="userInput">
+            <label for="enterUsername">playlist´s id</label>
+            <input type="text" id="enterPlaylistId">
+            <button onclick="getPlaylistById()">confirm</button>
         </div>
     </div>
     <!--selection of your Playlist-->
@@ -63,7 +76,7 @@
             to get to your converted playlist or just 
             <a onclick="returnLink()">copy</a>
             it. By clicking 
-            <a onclick="changeActiveSection('logIn')">here</a> 
+            <a href="#enterUsername" onclick="changeActiveSection('logIn')">here</a> 
             you´ll return to the log in page and will be able to convert another Playlist.
         </p>
     </div>
